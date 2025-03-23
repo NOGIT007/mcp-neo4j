@@ -1,3 +1,4 @@
+import os
 import neo4j
 import logging
 from logging.handlers import RotatingFileHandler
@@ -43,12 +44,17 @@ class neo4jDatabase:
             logger.error(f"Database error executing query: {e}\n{query}")
             raise
 
-async def main(neo4j_url: str, neo4j_username: str, neo4j_password: str):
-    logger.info(f"Connecting to neo4j MCP Server with DB URL: {neo4j_url}")
-
-    db = neo4jDatabase(neo4j_url, neo4j_username, neo4j_password)
+async def main():
+    # Get Neo4j connection details from environment variables
+    neo4j_uri = os.environ.get("NEO4J_URI", "neo4j://localhost:7687")
+    neo4j_username = os.environ.get("NEO4J_USERNAME", "neo4j")
+    neo4j_password = os.environ.get("NEO4J_PASSWORD", "password")
+    
+    logger.info(f"Connecting to neo4j MCP Server with DB URL: {neo4j_uri}")
+    
+    db = neo4jDatabase(neo4j_uri, neo4j_username, neo4j_password)
     server = Server("neo4j-manager")
-
+    
     # Register handlers
     logger.debug("Registering handlers")
 
